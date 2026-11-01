@@ -1,0 +1,21 @@
+(function(){
+const S=SITE,$=(s,r=document)=>r.querySelector(s),$$=(s,r=document)=>[...r.querySelectorAll(s)];
+const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const tel=p=>'tel:'+p.replace(/[^+\d]/g,'');
+const pages=[['index.html','Главная'],['classes.html','Занятия'],['about.html','О студии'],['contacts.html','Запись']];
+const cur=location.pathname.split('/').pop()||'index.html';
+$('#site-header').innerHTML=`<div class="wrap bar"><a class="logo" href="index.html"><img src="images/mark.png" alt="" width="38" height="38"><span>О.К. <i>фитнес</i></span></a><nav id="nav">${pages.map(p=>`<a href="${p[0]}"${p[0]===cur?' class="on"':''}>${p[1]}</a>`).join('')}<a class="btn sm" href="contacts.html">Записаться</a></nav><button id="burger" aria-label="Меню"><i></i><i></i><i></i></button></div>`;
+$('#burger').onclick=()=>$('#nav').classList.toggle('open');
+$('#site-footer').innerHTML=`<div class="wrap"><div class="foot"><div><b>О.К. фитнес</b>Йога и пилатес в Минске.<br>${S.address}<br>${S.entrance}</div><div><b>Разделы</b>${pages.map(p=>`<a href="${p[0]}">${p[1]}</a>`).join('<br>')}</div><div><b>Запись</b><a href="${tel(S.phone)}">${S.phone}</a><br><a href="https://instagram.com/${S.instagram}" target="_blank" rel="noopener">Instagram</a></div></div><div class="copy">© О.К. фитнес · Сайт сделал <a href="https://t3trix-hub.github.io/t3trix-portfolio/" target="_blank" rel="noopener">Lexey</a></div></div>`;
+$$('[data-site]').forEach(e=>e.textContent=S[e.dataset.site]);
+$$('[data-tel]').forEach(e=>e.href=tel(S.phone));$$('[data-ig]').forEach(e=>e.href='https://instagram.com/'+S.instagram);$$('[data-map]').forEach(e=>e.href=S.ymaps);
+const fm=$('#formats');
+if(fm)fm.innerHTML=FORMATS.map((f,i)=>`<article class="card rv"><span class="n">0${i+1}</span><h3>${esc(f[0])}</h3><p>${esc(f[1])}</p></article>`).join('');
+const pr=$('#prices');
+if(pr)pr.innerHTML=PRICES.length?PRICES.map(p=>`<div class="pl"><span>${esc(p[0])}${p[2]?`<small>${esc(p[2])}</small>`:''}</span><i></i><b>${p[1]} Br</b></div>`).join(''):'<p class="mut" style="margin:0">Расписание и стоимость занятий уточняйте в Instagram или по телефону: они могут меняться.</p>';
+$$('main h1,main h2,.card,.blob,.step,.cta>*,.faq details,.two>*').forEach(e=>e.classList.add('rv'));
+const io='IntersectionObserver' in window?new IntersectionObserver(es=>es.forEach(x=>{if(x.isIntersecting){const t=x.target;t.classList.add('in');io.unobserve(t);setTimeout(()=>t.style.transitionDelay='',900)}}),{threshold:.08}):null;
+let k=0;$$('.rv').forEach(e=>{if(!io)return e.classList.add('in');e.style.transitionDelay=Math.min(k++%5,4)*70+'ms';io.observe(e)});
+document.addEventListener('click',e=>{const a=e.target.closest('a[href]');if(!a||a.target||e.metaKey||e.ctrlKey||e.shiftKey||e.button)return;const u=new URL(a.href,location.href);if(u.origin!==location.origin||u.pathname===location.pathname||!/\.html?$|\/$/.test(u.pathname))return;e.preventDefault();document.body.classList.add('leave');setTimeout(()=>location.href=a.href,200)});
+addEventListener('pageshow',e=>{if(e.persisted)document.body.classList.remove('leave')});
+})();
